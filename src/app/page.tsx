@@ -1,34 +1,47 @@
-// import { cn } from "@/lib/utils";
-// "use client";
+// "use client"
 
-import { getQueryClient, trpc } from "@/trpc/server";
-import { Client } from "./client";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { requireAuth } from "@/lib/auth-utils"
+import { caller } from "@/trpc/server";
+import { LogoutButton} from "./logout";
 
 // import { Button } from "@/components/ui/button";
-// import { useTRPC } from "@/trpc/client";
-// import { useQuery } from "@tanstack/react-query";
-// import { Client } from "./client";
-// import { caller } from "@/trpc/server";
-// import { useEffect } from "react";
-  // useEffect(() => {}, []);
- const Page = async () => {
-//  const trpc = useTRPC();
-//  const { data: users } = useQuery(trpc.getUsers.queryOptions());
- const  queryClient = getQueryClient();
- void queryClient.prefetchQuery(trpc.getUsers.queryOptions());
-//  const { data: users } = useQuery({
-// const users = await caller.getUsers();
+// import { authClient } from "@/lib/auth-client";
+
+
+// const Page = () => {
+//   const {data} = authClient.useSession();
+
+
+//   return (
+//     <div className="min-h-screen min-w-screen flex items-center justify-center">
+//      {JSON.stringify(data)}
+//      {data && (
+//      <Button onClick={() => authClient.signOut()}>
+//       Logout
+//      </Button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default Page;
+
+
+
+const Page = async () => {
+  await requireAuth();
+
+  const data = await caller.getUsers();
+
   return (
-  <div className="min-h-screen min-w-screen flex items-center justify-center">
-    {/* <Client users={users} /> */}
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<div>Loading...</div>}>
-    <Client/>
-    </Suspense>
-    </HydrationBoundary>
-    </div>
+    <div className="min-h-screen min-w-screen flex items-center justify-center flex-col gap-y-6">
+      Protected server component
+      <div>
+      {JSON.stringify(data, null , 2)}
+      </div>
+      <LogoutButton />
+      </div>
   );
 };
+
 export default Page;
